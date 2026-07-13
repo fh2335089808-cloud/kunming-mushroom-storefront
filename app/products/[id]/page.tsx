@@ -1,2 +1,10 @@
-import Image from "next/image"; import Link from "next/link"; import {notFound} from "next/navigation"; import {StoreHeader} from "@/components/store-header"; import {products} from "@/lib/data"; import {ToastButton} from "@/components/ui";
-export default async function Detail({params}:{params:Promise<{id:string}>}){const {id}=await params;const p=products.find(x=>x.id===id);if(!p)return notFound();return <><StoreHeader/><main className="container py-10"><Link href="/products" className="text-sm text-forest-500">← 返回鲜菌市集</Link><div className="mt-6 grid gap-10 md:grid-cols-2"><div className="relative min-h-[420px] overflow-hidden rounded-3xl"><Image src={p.image} alt={p.name} fill className="object-cover"/></div><div><span className="rounded-full bg-forest-50 px-3 py-1 text-xs text-forest-700">产地直采 · {p.origin}</span><h1 className="mt-5 text-4xl font-bold">{p.name}</h1><p className="mt-5 leading-8 text-gray-600">{p.description}</p><div className="my-7 border-y border-forest-100 py-5"><span className="text-3xl font-bold text-clay">¥{p.price}</span><span className="ml-2 text-sm text-gray-500">{p.spec}</span><p className="mt-2 text-sm text-forest-500">现货库存：{p.stock} 盒 · 昆明主城最快90分钟送达</p></div><ToastButton>加入购物车</ToastButton><div className="mt-8 rounded-2xl bg-forest-50 p-5 text-sm leading-7"><b>食用提醒</b><br/>野生菌须彻底加热后食用；见手青等菌种请勿凉拌或生食。</div></div></div></main></>}
+﻿import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { products } from '@/lib/data';
+
+export function generateStaticParams() { return products.map((product) => ({ id: product.id })); }
+export const dynamicParams = false;
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; const product = products.find((item) => item.id === id); if (!product) notFound();
+  return <main className="container py-12"><Link href="/products" className="text-sm text-forest-500">返回鲜菌列表</Link><h1 className="mt-6 text-4xl font-serif">{product.name}</h1><p className="mt-3 text-stone-600">{product.description}</p><p className="mt-6 text-2xl font-semibold text-forest-700">¥{product.price} <span className="text-sm font-normal">{product.spec}</span></p></main>;
+}
