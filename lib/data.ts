@@ -1,0 +1,8 @@
+export type Product={id:string;name:string;origin:string;price:number;spec:string;stock:number;image:string;description:string;purchase:number;supplier:string};
+export const products:Product[]=[
+{id:"jizong",name:"鸡枞菌",origin:"楚雄南华",price:168,spec:"250g / 盒",stock:36,image:"https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?auto=format&fit=crop&w=900&q=80",description:"肉质细嫩清甜，菌香浓郁，是云南雨季餐桌上的珍贵鲜味。",purchase:118,supplier:"南华山野合作社"},
+{id:"jianshouqing",name:"见手青",origin:"昆明宜良",price:98,spec:"300g / 盒",stock:52,image:"https://images.unsplash.com/photo-1472141521881-95d0e87e2e39?auto=format&fit=crop&w=900&q=80",description:"新鲜牛肝菌类，烹饪需充分加热，风味醇厚饱满。",purchase:62,supplier:"宜良菌农基地"},
+{id:"songrong",name:"松茸",origin:"迪庆香格里拉",price:328,spec:"200g / 礼盒",stock:18,image:"https://images.unsplash.com/photo-1504439468489-c8920d796a29?auto=format&fit=crop&w=900&q=80",description:"高海拔冷杉林自然孕育，香气纯净，适合炭烤或清汤。",purchase:248,supplier:"香格里拉林下农场"},
+{id:"niuganjun",name:"牛肝菌",origin:"大理剑川",price:78,spec:"300g / 盒",stock:71,image:"https://images.unsplash.com/photo-1512595768894-44c31099f124?auto=format&fit=crop&w=900&q=80",description:"口感扎实，带有坚果般香气，煎炒炖汤皆宜。",purchase:48,supplier:"剑川鲜菌中心"}];
+export const market=[{name:"鸡枞菌",price:"¥672/kg",change:"↑ 8.5%",up:true},{name:"见手青",price:"¥218/kg",change:"↑ 3.2%",up:true},{name:"松茸",price:"¥1,480/kg",change:"↓ 2.1%",up:false},{name:"牛肝菌",price:"¥156/kg",change:"↑ 5.6%",up:true}];
+export const customers=[{name:"李女士",phone:"138****8890",orders:12,total:"¥2,486",tag:"高价值客户"},{name:"张先生",phone:"186****3812",orders:8,total:"¥1,264",tag:"复购客户"},{name:"陈女士",phone:"159****2208",orders:3,total:"¥586",tag:"新客户"}];
