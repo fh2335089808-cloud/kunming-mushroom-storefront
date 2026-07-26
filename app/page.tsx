@@ -3,7 +3,7 @@ import { MapPin, MessageCircle, PackageCheck, Sprout } from 'lucide-react';
 import { FreshProducts } from '@/components/fresh-products';
 import { OrderFormLink } from '@/components/order-form-link';
 
-const ORDER_FORM_URL = 'https://mushroom-order-form.vercel.app/';
+const ORDER_FORM_URL = 'https://order.kunming-mushroom.asia/';
 
 const products = [
   { name: '鸡枞菌', source: '云南当季鲜选', feature: '菌香浓郁，口感鲜嫩', cook: '适合清炒、煲汤、炖鸡', price: '今日参考价：¥168 / 500g（以当天到货为准）', image: '/images/mushrooms/jizong.jpg', availability: '少量到货' },
