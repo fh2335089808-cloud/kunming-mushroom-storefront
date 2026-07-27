@@ -87,7 +87,7 @@ export function FreshProducts({ products }: { products: FreshProduct[] }) {
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {products.map((item) => (
           <article key={item.name} className="overflow-hidden rounded-2xl bg-white shadow-soft">
-            <div className="relative h-64"><Image fill sizes="(max-width: 768px) 100vw, 33vw" src={item.image} alt={item.name} className="object-cover" /></div>
+            <div className="relative aspect-[4/3] overflow-hidden bg-stone-200"><Image fill sizes="(max-width: 768px) 100vw, 33vw" src={item.image} alt={item.name} loading="lazy" className="object-cover" /></div>
             <div className="p-5">
               <p className="text-xs text-forest-500">{item.source}</p>
               <h3 className="mt-2 font-serif text-2xl">{item.name}</h3>
@@ -117,7 +117,7 @@ export function FreshProducts({ products }: { products: FreshProduct[] }) {
               <div aria-live="polite" className="whitespace-pre-line rounded-2xl bg-white p-4 text-sm leading-6 text-stone-600">{inquiry}</div>
               <button type="button" onClick={copyInquiry} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-forest-700 px-4 py-3 text-sm font-semibold text-white">{copied ? <Check size={18} /> : <Copy size={18} />}{copied ? '已复制，请添加微信后粘贴发送' : '复制询价内容'}</button>
               <button type="button" onClick={() => setShowQr((visible) => !visible)} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-forest-500 px-4 py-3 text-sm font-semibold text-forest-700"><QrCode size={18} />查看微信二维码</button>
-              {showQr && <div className="rounded-2xl bg-white p-3 text-center"><Image src="/images/wechat-qr.png" alt="微信二维码" width={300} height={444} className="mx-auto h-auto w-[250px] max-w-full object-contain" /><p className="mt-2 text-xs text-stone-500">长按识别二维码，或保存图片后使用微信扫码添加。</p></div>}
+              {showQr && <div className="rounded-2xl bg-white p-3 text-center"><Image src="/images/wechat-qr.png" alt="微信二维码" width={300} height={444} loading="lazy" className="mx-auto h-auto w-[250px] max-w-full object-contain" /><p className="mt-2 text-xs text-stone-500">长按识别二维码，或保存图片后使用微信扫码添加。</p></div>}
             </div>
           </section>
         </div>
