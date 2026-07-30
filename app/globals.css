@@ -6,3 +6,8 @@ body { margin:0; color:#1c2b1f; background:#f7f4ec; font-family:Arial,"PingFang 
 .container { max-width:1180px; margin:0 auto; padding:0 24px; }
 .card { @apply rounded-2xl border border-forest-100 bg-white shadow-soft; }
 .eyebrow { @apply text-xs font-bold tracking-[.18em] text-forest-500 uppercase; }
+
+.mobile-sticky-cta { bottom: calc(1rem + env(safe-area-inset-bottom)); }
+.mobile-safe-footer { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+@media (min-width: 768px) { .mobile-safe-footer { padding-bottom: 2rem; } }

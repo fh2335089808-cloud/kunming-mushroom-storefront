@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 const SOURCE_STORAGE_KEY = 'junxiandao_traffic_source';
-const VERCEL_HOSTNAME = 'kunming-mushroom-mvp.vercel.app';
 
 type OrderFormLinkProps = {
   baseUrl: string;
+  children?: ReactNode;
+  className?: string;
   mobile?: boolean;
 };
 
-export function OrderFormLink({ baseUrl, mobile = false }: OrderFormLinkProps) {
+export function OrderFormLink({ baseUrl, children = '立即登记购买', className, mobile = false }: OrderFormLinkProps) {
   const [orderUrl, setOrderUrl] = useState(`${baseUrl}?source=official`);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export function OrderFormLink({ baseUrl, mobile = false }: OrderFormLinkProps) {
       const target = new URL(baseUrl);
       target.searchParams.set(
         'source',
-        window.location.hostname === VERCEL_HOSTNAME ? 'vercel' : 'official',
+        window.location.hostname.endsWith('.vercel.app') ? 'vercel' : 'official',
       );
 
       const trafficSource = new URLSearchParams(window.location.search).get('src')?.trim();
@@ -36,13 +37,13 @@ export function OrderFormLink({ baseUrl, mobile = false }: OrderFormLinkProps) {
   return (
     <a
       href={orderUrl}
-      className={
+      className={className ?? (
         mobile
           ? 'inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-amber-100 px-4 py-2.5 text-sm font-semibold text-forest-900 shadow-lg'
           : 'inline-flex min-h-12 items-center justify-center rounded-full bg-amber-100 px-6 py-3 text-sm font-semibold text-forest-900 shadow-lg shadow-black/15 transition hover:bg-amber-50'
-      }
+      )}
     >
-      立即登记购买
+      {children}
     </a>
   );
 }
