@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { MapPin, PackageCheck, Sprout } from 'lucide-react';
+import { ArrowRight, MapPin, PackageCheck, Sprout } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { FreshProducts } from '@/components/fresh-products';
 import { OrderFormLink } from '@/components/order-form-link';
 import { MobileNav } from '@/components/mobile-nav';
@@ -16,17 +17,23 @@ const products = [
   { name: '牛肝菌', source: '云南菌市当日鲜选', feature: '菌肉厚实，香气醇厚', cook: '适合爆炒、炒饭、意面', price: '今日到货后现价，预计 ¥108–¥148 / 500g', image: '/images/mushrooms/porcini.webp', availability: '随市场更新' },
 ];
 
-const trust = [['云南产区鲜选', '根据菌季和当天状态进行筛选'], ['每日市场更新', '价格、品种和库存随市场变化'], ['昆明同城配送', '具体配送范围和时效微信确认']];
-const mobileTrust = [
-  { title: '每日市场更新', text: '价格、品种和库存随市场变化', Icon: PackageCheck },
-  { title: '昆明同城配送', text: '具体配送范围与时效请咨询', Icon: MapPin },
-  { title: '云南产区鲜选', text: '根据菌季和当天状态筛选', Icon: Sprout },
+const trust = [
+  { title: '云南产区鲜选', text: '根据菌季和当天状态进行筛选', mobileText: '根据菌季和当天状态筛选', href: '#fresh', Icon: Sprout },
+  { title: '每日市场更新', text: '价格、品种和库存随市场变化', mobileText: '价格、品种和库存随市场变化', href: '#market', Icon: PackageCheck },
+  { title: '昆明同城配送', text: '具体配送范围和时效微信确认', mobileText: '具体配送范围与时效请咨询', href: ORDER_FORM_URL, Icon: MapPin },
 ];
+const mobileTrust = [trust[1], trust[2], trust[0]];
 const gallery = [['松茸', '/images/mushrooms/matsutake.webp'], ['牛肝菌', '/images/mushrooms/porcini.webp'], ['鸡枞菌', '/images/mushrooms/jizong.webp'], ['鸡油菌', '/images/mushrooms/chanterelle.webp'], ['大红菌', '/images/mushrooms/red-mushroom.webp'], ['青头菌', '/images/mushrooms/greenhead.webp'], ['干巴菌', '/images/mushrooms/termite-mushroom.webp'], ['竹荪', '/images/mushrooms/bamboo-fungus.webp']];
 const recipes = [
   { name: '鲜菌海味小炒', note: '鲜菌搭配时蔬与虾仁，旺火快炒，保留山野清鲜。', image: '/images/mushrooms/seafood-mushroom.webp' },
   { name: '山野菌焖锅', note: '多种鲜菌慢火焖香，适合与家人分享的一餐。', image: '/images/mushrooms/mushroom-pot.webp' },
 ];
+
+function ServiceLink({ children, className, href }: { children: ReactNode; className: string; href: string }) {
+  return href === ORDER_FORM_URL
+    ? <OrderFormLink baseUrl={ORDER_FORM_URL} className={className}>{children}</OrderFormLink>
+    : <a href={href} className={className}>{children}</a>;
+}
 
 export default function Home() {
   return <main className="overflow-x-hidden bg-[#f7f4ec]">
@@ -54,22 +61,23 @@ export default function Home() {
 
     <section className="bg-white md:relative md:-mt-8 md:bg-transparent">
       <div className="container divide-y divide-forest-100 py-3 md:hidden">
-        {mobileTrust.map(({ title, text, Icon }) => (
-          <div key={title} className="flex items-center gap-3 py-2.5">
+        {mobileTrust.map(({ title, mobileText, Icon, href }) => (
+          <ServiceLink key={title} href={href} className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors active:bg-forest-50">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest-50 text-forest-600"><Icon size={17} /></span>
             <div className="min-w-0">
               <h2 className="text-sm font-semibold text-forest-900">{title}</h2>
-              <p className="mt-0.5 text-xs leading-5 text-stone-500">{text}</p>
+              <p className="mt-0.5 text-xs leading-5 text-stone-500">{mobileText}</p>
             </div>
-          </div>
+            <ArrowRight aria-hidden="true" size={16} className="ml-auto shrink-0 text-stone-300 transition-transform group-hover:translate-x-0.5 group-active:translate-x-1" />
+          </ServiceLink>
         ))}
       </div>
       <div className="container hidden grid-cols-3 gap-3 px-6 pb-2 md:grid">
-        {trust.map(([title, text], index) => <article key={title} className="rounded-2xl bg-white p-5 shadow-soft"><div className="mb-3 text-forest-500">{index === 0 ? <Sprout size={21} /> : index === 1 ? <PackageCheck size={21} /> : <MapPin size={21} />}</div><h2 className="font-serif text-xl">{title}</h2><p className="mt-2 text-sm leading-6 text-stone-500">{text}</p></article>)}
+        {trust.map(({ title, text, Icon, href }) => <ServiceLink key={title} href={href} className="group block rounded-2xl bg-white p-5 shadow-soft transition duration-150 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-[0.99]"><div className="mb-3 flex items-center justify-between text-forest-500"><Icon size={21} /><ArrowRight aria-hidden="true" size={18} className="text-stone-300 transition-transform group-hover:translate-x-1" /></div><h2 className="font-serif text-xl">{title}</h2><p className="mt-2 text-sm leading-6 text-stone-500">{text}</p></ServiceLink>)}
       </div>
     </section>
 
-    <section id="market" className="container pb-16 pt-8 sm:py-24"><span id="fresh" className="scroll-mt-8" /><p className="text-xs font-semibold tracking-[.2em] text-forest-500">TODAY&apos;S MARKET UPDATE</p><h2 className="mt-3 font-serif text-3xl sm:text-4xl">今日菌市行情</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-stone-500">每日从菌市带回当季鲜味。野生菌价格和供应量随天气与到货变化，以下为当天参考，具体品相、规格和库存请在询价时确认。</p><FreshProducts products={products} /></section>
+    <section id="market" className="container scroll-mt-20 pb-16 pt-8 sm:py-24"><p className="text-xs font-semibold tracking-[.2em] text-forest-500">TODAY&apos;S MARKET UPDATE</p><h2 className="mt-3 font-serif text-3xl sm:text-4xl">今日菌市行情</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-stone-500">每日从菌市带回当季鲜味。野生菌价格和供应量随天气与到货变化，以下为当天参考，具体品相、规格和库存请在询价时确认。</p><div id="fresh" className="scroll-mt-20"><FreshProducts products={products} /></div></section>
 
     <BuyerGallery />
 
