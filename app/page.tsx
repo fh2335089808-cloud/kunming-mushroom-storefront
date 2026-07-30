@@ -53,10 +53,10 @@ export default function Home() {
 
     <section id="story" className="container py-16 sm:py-24"><div className="grid gap-9 md:grid-cols-2 md:items-center"><div><p className="text-xs font-semibold tracking-[.2em] text-forest-500">FROM MARKET TO TABLE</p><h2 className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">一颗菌子的鲜味旅程</h2><p className="mt-6 text-sm leading-7 text-stone-600">云南的野生菌随着天气、海拔和菌季不断变化。</p><p className="mt-4 text-sm leading-7 text-stone-600">我们根据当天到货情况，查看菌子的完整度、新鲜度和品相，再选择适合家庭餐桌和餐饮使用的菌子。</p><p className="mt-4 text-sm leading-7 text-stone-600">这里不追求长期库存，而是跟随菌季，把当天状态更好的鲜菌分享给真正喜欢云南味道的人。</p></div><div className="grid grid-cols-2 gap-3"><div className="relative col-span-2 h-52 overflow-hidden rounded-2xl"><Image fill sizes="(max-width:768px) 100vw, 50vw" src="/images/forest-hero.webp" alt="云南山林" className="object-cover" /></div><div className="rounded-2xl bg-[#e8e7d8] p-5 text-sm text-forest-700">云南山林<br /><span className="text-xs text-stone-500">随菌季而来</span></div><div className="rounded-2xl bg-forest-900 p-5 text-sm text-white">市场鲜选<br /><span className="text-xs text-white/65">查看品相与状态</span></div></div></div></section>
 
-    <div className="fixed inset-x-4 bottom-4 z-20 flex items-center gap-2 md:hidden">
+    <div className="mobile-sticky-cta fixed inset-x-4 z-20 flex items-center gap-2 md:hidden">
       <OrderFormLink baseUrl={ORDER_FORM_URL} mobile />
       <a href="#wechat" aria-label="微信咨询" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-forest-700 px-4 py-2.5 text-sm font-medium text-white shadow-lg"><MessageCircle size={18} />微信咨询</a>
     </div>
-    <footer className="bg-[#38281d] px-5 py-8 text-center text-xs leading-6 text-white/65">云南野生菌鲜选<br />昆明同城配送范围和当天库存请通过微信咨询<br />{siteConfig.brandName} · 联系电话：<a className="underline underline-offset-2" href={`tel:${siteConfig.contactPhoneHref}`}>{siteConfig.contactPhoneDisplay}</a> · 微信：{siteConfig.wechatNumber} · 经营地址：{siteConfig.businessAddress}<br />© 2026 {siteConfig.brandName}</footer>
+    <footer className="mobile-safe-footer bg-[#38281d] px-5 py-8 text-center text-xs leading-6 text-white/65">云南野生菌鲜选<br />昆明同城配送范围和当天库存请通过微信咨询<br />{siteConfig.brandName} · 联系电话：<a className="underline underline-offset-2" href={`tel:${siteConfig.contactPhoneHref}`}>{siteConfig.contactPhoneDisplay}</a> · 微信：{siteConfig.wechatNumber} · 经营地址：{siteConfig.businessAddress}<br />© 2026 {siteConfig.brandName}</footer>
   </main>;
 }

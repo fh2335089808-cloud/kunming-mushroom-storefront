@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 
 const SOURCE_STORAGE_KEY = 'junxiandao_traffic_source';
-const VERCEL_HOSTNAME = 'kunming-mushroom-mvp.vercel.app';
 
 type OrderFormLinkProps = {
   baseUrl: string;
@@ -18,7 +17,7 @@ export function OrderFormLink({ baseUrl, mobile = false }: OrderFormLinkProps) {
       const target = new URL(baseUrl);
       target.searchParams.set(
         'source',
-        window.location.hostname === VERCEL_HOSTNAME ? 'vercel' : 'official',
+        window.location.hostname.endsWith('.vercel.app') ? 'vercel' : 'official',
       );
 
       const trafficSource = new URLSearchParams(window.location.search).get('src')?.trim();

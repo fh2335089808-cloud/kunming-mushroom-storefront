@@ -27,10 +27,27 @@ export function BuyerGallery() {
               </div>
             </article>
           ))}
+          {expanded ? (
+            <article className="w-[72vw] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-2xl bg-white p-5 text-center shadow-soft sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.67rem)] lg:max-w-none">
+              <h3 className="font-serif text-2xl text-stone-800">进群看今日鲜菌</h3>
+              <p className="mt-3 text-sm leading-6 text-stone-600">每日更新到货品种、真实品相和当天价格</p>
+              <Image
+                src="/images/wechat-group-qr.jpg"
+                alt="魅力之城野生菌预购群微信群二维码"
+                width={590}
+                height={992}
+                loading="lazy"
+                className="mx-auto mt-5 h-auto w-[200px] max-w-full"
+              />
+              <p className="mt-4 text-sm font-medium text-forest-700">长按识别二维码加入群聊</p>
+              <p className="mt-2 text-xs leading-5 text-stone-500">群满或二维码失效，可添加微信咨询入群</p>
+            </article>
+          ) : null}
         </div>
         <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-forest-500 px-5 py-2.5 text-sm font-semibold text-forest-700">
-          {expanded ? '收起买家秀' : '查看更多买家秀'}
+          {expanded ? '收起买家秀' : '查看更多买家秀与今日鲜菌'}
         </button>
+        <p className="mt-2 text-xs leading-5 text-stone-500">群内持续更新到货实拍、当天品种与价格</p>
       </div>
     </section>
   );
