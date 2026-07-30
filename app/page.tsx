@@ -1,9 +1,10 @@
 import Image from 'next/image';
-import { MapPin, MessageCircle, PackageCheck, Sprout } from 'lucide-react';
+import { MapPin, PackageCheck, Sprout } from 'lucide-react';
 import { FreshProducts } from '@/components/fresh-products';
 import { OrderFormLink } from '@/components/order-form-link';
 import { MobileNav } from '@/components/mobile-nav';
 import { BuyerGallery } from '@/components/buyer-gallery';
+import { MobileStickyActions } from '@/components/mobile-sticky-actions';
 import { siteConfig, siteCopy } from '@/config/site';
 
 const ORDER_FORM_URL = siteConfig.orderFormUrl;
@@ -16,6 +17,11 @@ const products = [
 ];
 
 const trust = [['云南产区鲜选', '根据菌季和当天状态进行筛选'], ['每日市场更新', '价格、品种和库存随市场变化'], ['昆明同城配送', '具体配送范围和时效微信确认']];
+const mobileTrust = [
+  { title: '每日市场更新', text: '价格、品种和库存随市场变化', Icon: PackageCheck },
+  { title: '昆明同城配送', text: '具体配送范围与时效请咨询', Icon: MapPin },
+  { title: '云南产区鲜选', text: '根据菌季和当天状态筛选', Icon: Sprout },
+];
 const gallery = [['松茸', '/images/mushrooms/matsutake.webp'], ['牛肝菌', '/images/mushrooms/porcini.webp'], ['鸡枞菌', '/images/mushrooms/jizong.webp'], ['鸡油菌', '/images/mushrooms/chanterelle.webp'], ['大红菌', '/images/mushrooms/red-mushroom.webp'], ['青头菌', '/images/mushrooms/greenhead.webp'], ['干巴菌', '/images/mushrooms/termite-mushroom.webp'], ['竹荪', '/images/mushrooms/bamboo-fungus.webp']];
 const recipes = [
   { name: '鲜菌海味小炒', note: '鲜菌搭配时蔬与虾仁，旺火快炒，保留山野清鲜。', image: '/images/mushrooms/seafood-mushroom.webp' },
@@ -24,22 +30,46 @@ const recipes = [
 
 export default function Home() {
   return <main className="overflow-x-hidden bg-[#f7f4ec]">
-    <section id="home" className="relative min-h-[76svh] overflow-hidden bg-forest-900 text-white sm:min-h-[720px]">
+    <section id="home" className="relative min-h-[68svh] overflow-hidden bg-forest-900 text-white sm:min-h-[720px]">
       <Image priority fetchPriority="high" decoding="sync" fill sizes="100vw" src="/images/forest-hero.webp" alt="云南山野森林" className="object-cover object-[58%_center] opacity-55 sm:object-center" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-forest-900/15 to-forest-900" />
       <MobileNav />
-      <div className="container relative pb-10 pt-10 sm:pt-24">
+      <div className="container relative pb-5 pt-7 sm:pb-10 sm:pt-24">
         <p className="hidden text-xs font-semibold tracking-[.24em] text-amber-200 sm:block">KUNMING · WILD MUSHROOMS</p>
-        <h1 className="mt-3 max-w-[345px] font-serif text-[44px] leading-[1.15] tracking-tight sm:mt-4 sm:max-w-3xl sm:text-7xl">云南野生菌<br /><span className="text-amber-100">每日鲜选 · 昆明直送</span></h1>
+        <h1 className="mt-3 max-w-[390px] font-serif text-[40px] leading-[1.12] tracking-tight sm:mt-4 sm:max-w-3xl sm:text-7xl sm:leading-[1.15]">
+          云南野生菌<br />
+          <span className="text-amber-100">
+            <span className="sm:hidden">
+              <span className="min-[420px]:hidden">每日鲜选<br />昆明直送</span>
+              <span className="hidden min-[420px]:inline">每日鲜选·昆明直送</span>
+            </span>
+            <span className="hidden sm:inline">每日鲜选 · 昆明直送</span>
+          </span>
+        </h1>
         <p className="mt-4 max-w-lg text-sm leading-6 text-white/85 sm:mt-7 sm:leading-8">深入云南菌市，精选当季新鲜野生菌。<br className="hidden sm:block" />每日更新上市品种、菌价和库存，让山野鲜味更快到达餐桌。</p>
         <div className="mt-4 max-w-2xl space-y-1.5 border-l border-amber-100/45 pl-3 text-xs leading-5 text-white/75 sm:text-sm"><p>{siteCopy.deliverySummary}</p><p>{siteCopy.brandSummary}</p></div>
-        <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-7"><OrderFormLink baseUrl={ORDER_FORM_URL} /><a href="#wechat" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/50 px-5 py-3 text-sm">微信咨询</a><a href="#market" className="inline-flex min-h-11 items-center px-2 text-sm text-white/80 underline decoration-white/35 underline-offset-4">查看今日鲜菌</a></div>
+        <div id="hero-actions" className="mt-5 flex flex-wrap items-center gap-3 sm:mt-7"><OrderFormLink baseUrl={ORDER_FORM_URL} /><a href="#wechat" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/50 px-5 py-3 text-sm">微信咨询</a><a href="#market" className="hidden min-h-11 items-center px-2 text-sm text-white/80 underline decoration-white/35 underline-offset-4 sm:inline-flex">查看今日鲜菌</a></div>
       </div>
     </section>
 
-    <section className="relative -mt-6 sm:-mt-8"><div className="container flex snap-x gap-3 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible md:px-6">{trust.map(([title, text], index) => <article key={title} className="w-[78vw] shrink-0 snap-start rounded-2xl bg-white p-5 shadow-soft md:w-auto"><div className="mb-3 text-forest-500">{index === 0 ? <Sprout size={21} /> : index === 1 ? <PackageCheck size={21} /> : <MapPin size={21} />}</div><h2 className="font-serif text-xl">{title}</h2><p className="mt-2 text-sm leading-6 text-stone-500">{text}</p></article>)}</div></section>
+    <section className="bg-white md:relative md:-mt-8 md:bg-transparent">
+      <div className="container divide-y divide-forest-100 py-3 md:hidden">
+        {mobileTrust.map(({ title, text, Icon }) => (
+          <div key={title} className="flex items-center gap-3 py-2.5">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest-50 text-forest-600"><Icon size={17} /></span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold text-forest-900">{title}</h2>
+              <p className="mt-0.5 text-xs leading-5 text-stone-500">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="container hidden grid-cols-3 gap-3 px-6 pb-2 md:grid">
+        {trust.map(([title, text], index) => <article key={title} className="rounded-2xl bg-white p-5 shadow-soft"><div className="mb-3 text-forest-500">{index === 0 ? <Sprout size={21} /> : index === 1 ? <PackageCheck size={21} /> : <MapPin size={21} />}</div><h2 className="font-serif text-xl">{title}</h2><p className="mt-2 text-sm leading-6 text-stone-500">{text}</p></article>)}
+      </div>
+    </section>
 
-    <section id="market" className="container py-16 sm:py-24"><span id="fresh" className="scroll-mt-8" /><p className="text-xs font-semibold tracking-[.2em] text-forest-500">TODAY&apos;S MARKET UPDATE</p><h2 className="mt-3 font-serif text-3xl sm:text-4xl">今日菌市行情</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-stone-500">每日从菌市带回当季鲜味。野生菌价格和供应量随天气与到货变化，以下为当天参考，具体品相、规格和库存请在询价时确认。</p><FreshProducts products={products} /></section>
+    <section id="market" className="container pb-16 pt-8 sm:py-24"><span id="fresh" className="scroll-mt-8" /><p className="text-xs font-semibold tracking-[.2em] text-forest-500">TODAY&apos;S MARKET UPDATE</p><h2 className="mt-3 font-serif text-3xl sm:text-4xl">今日菌市行情</h2><p className="mt-4 max-w-2xl text-sm leading-7 text-stone-500">每日从菌市带回当季鲜味。野生菌价格和供应量随天气与到货变化，以下为当天参考，具体品相、规格和库存请在询价时确认。</p><FreshProducts products={products} /></section>
 
     <BuyerGallery />
 
@@ -53,10 +83,7 @@ export default function Home() {
 
     <section id="story" className="container py-16 sm:py-24"><div className="grid gap-9 md:grid-cols-2 md:items-center"><div><p className="text-xs font-semibold tracking-[.2em] text-forest-500">FROM MARKET TO TABLE</p><h2 className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">一颗菌子的鲜味旅程</h2><p className="mt-6 text-sm leading-7 text-stone-600">云南的野生菌随着天气、海拔和菌季不断变化。</p><p className="mt-4 text-sm leading-7 text-stone-600">我们根据当天到货情况，查看菌子的完整度、新鲜度和品相，再选择适合家庭餐桌和餐饮使用的菌子。</p><p className="mt-4 text-sm leading-7 text-stone-600">这里不追求长期库存，而是跟随菌季，把当天状态更好的鲜菌分享给真正喜欢云南味道的人。</p></div><div className="grid grid-cols-2 gap-3"><div className="relative col-span-2 h-52 overflow-hidden rounded-2xl"><Image fill sizes="(max-width:768px) 100vw, 50vw" src="/images/forest-hero.webp" alt="云南山林" className="object-cover" /></div><div className="rounded-2xl bg-[#e8e7d8] p-5 text-sm text-forest-700">云南山林<br /><span className="text-xs text-stone-500">随菌季而来</span></div><div className="rounded-2xl bg-forest-900 p-5 text-sm text-white">市场鲜选<br /><span className="text-xs text-white/65">查看品相与状态</span></div></div></div></section>
 
-    <div className="mobile-sticky-cta fixed inset-x-4 z-20 flex items-center gap-2 md:hidden">
-      <OrderFormLink baseUrl={ORDER_FORM_URL} mobile />
-      <a href="#wechat" aria-label="微信咨询" className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-forest-700 px-4 py-2.5 text-sm font-medium text-white shadow-lg"><MessageCircle size={18} />微信咨询</a>
-    </div>
+    <MobileStickyActions baseUrl={ORDER_FORM_URL} />
     <footer className="mobile-safe-footer bg-[#38281d] px-5 py-8 text-center text-xs leading-6 text-white/65">云南野生菌鲜选<br />昆明同城配送范围和当天库存请通过微信咨询<br />{siteConfig.brandName} · 联系电话：<a className="underline underline-offset-2" href={`tel:${siteConfig.contactPhoneHref}`}>{siteConfig.contactPhoneDisplay}</a> · 微信：{siteConfig.wechatNumber} · 经营地址：{siteConfig.businessAddress}<br />© 2026 {siteConfig.brandName}</footer>
   </main>;
 }
