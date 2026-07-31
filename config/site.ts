@@ -8,7 +8,7 @@ export const siteConfig = {
   contactPhoneHref: '18886983687',
   wechatNumber: '17387628526',
   businessAddress: '云南省昆明市官渡区广居路934号',
-  orderFormUrl: 'https://order.kunming-mushroom.asia/',
+  orderFormUrl: '/order',
 } as const;
 
 export const siteCopy = {

@@ -7,8 +7,8 @@ const outputDir = path.join(root, 'public', 'qrcode');
 const expected = {
   'brand-wechat-qr.png': 'https://www.kunming-mushroom.asia/?utm_source=wechat&utm_medium=qr&utm_campaign=brand',
   'brand-wechat-qr.svg': 'https://www.kunming-mushroom.asia/?utm_source=wechat&utm_medium=qr&utm_campaign=brand',
-  'order-wechat-qr.png': 'https://order.kunming-mushroom.asia/?source=official&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order',
-  'order-wechat-qr.svg': 'https://order.kunming-mushroom.asia/?source=official&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order',
+  'order-wechat-qr.png': 'https://www.kunming-mushroom.asia/order?src=wechat_qr&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order',
+  'order-wechat-qr.svg': 'https://www.kunming-mushroom.asia/order?src=wechat_qr&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order',
 };
 for (const [filename, expectedUrl] of Object.entries(expected)) {
   const { data, info } = await sharp(path.join(outputDir, filename)).resize(1200, 1200, { fit: 'contain', background: '#FFFFFF' }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });

@@ -12,25 +12,20 @@ type OrderFormLinkProps = {
 };
 
 export function OrderFormLink({ baseUrl, children = '立即登记购买', className, mobile = false }: OrderFormLinkProps) {
-  const [orderUrl, setOrderUrl] = useState(`${baseUrl}?source=official`);
+  const [orderUrl, setOrderUrl] = useState(baseUrl);
 
   useEffect(() => {
     try {
-      const target = new URL(baseUrl);
-      target.searchParams.set(
-        'source',
-        window.location.hostname.endsWith('.vercel.app') ? 'vercel' : 'official',
-      );
-
+      const target = new URL(baseUrl, window.location.origin);
       const trafficSource = new URLSearchParams(window.location.search).get('src')?.trim();
       if (trafficSource) {
         window.localStorage.setItem(SOURCE_STORAGE_KEY, trafficSource);
         target.searchParams.set('src', trafficSource);
       }
 
-      setOrderUrl(target.toString());
+      setOrderUrl(`${target.pathname}${target.search}${target.hash}`);
     } catch {
-      setOrderUrl(`${baseUrl}?source=official`);
+      setOrderUrl(baseUrl);
     }
   }, [baseUrl]);
 
