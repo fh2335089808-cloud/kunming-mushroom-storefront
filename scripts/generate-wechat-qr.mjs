@@ -8,7 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outputDir = path.join(root, 'public', 'qrcode');
 const assets = [
   { key: 'brand', url: 'https://www.kunming-mushroom.asia/?utm_source=wechat&utm_medium=qr&utm_campaign=brand', title: '菌鲜到', lines: ['云南野生菌 · 新鲜直达', '微信扫码了解当季菌子'], poster: 'brand-wechat-poster.png' },
-  { key: 'order', url: 'https://order.kunming-mushroom.asia/?source=official&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order', title: '云南野生菌订购登记', lines: ['微信扫码登记需求', '提交后由工作人员联系确认', '本页面不直接收款'], poster: 'order-wechat-poster.png' },
+  { key: 'order', url: 'https://www.kunming-mushroom.asia/order?src=wechat_qr&utm_source=wechat&utm_medium=qr&utm_campaign=direct_order', title: '云南野生菌订购登记', lines: ['微信扫码登记需求', '提交后由工作人员联系确认', '本页面不直接收款'], poster: 'order-wechat-poster.png' },
 ];
 const qrOptions = { errorCorrectionLevel: 'H', margin: 4, width: 1200, color: { dark: '#1F3D2D', light: '#FFFFFFFF' } };
 const escapeXml = (value) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
