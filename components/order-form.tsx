@@ -3,6 +3,8 @@
 import { CheckCircle2, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { WechatContactDialog } from '@/components/wechat-contact-dialog';
+import { siteConfig } from '@/config/site';
 
 const ORDER_API_URL = 'https://order.kunming-mushroom.asia/api/order/submit';
 const DRAFT_KEY = 'order_form_draft';
@@ -72,7 +74,7 @@ function parseResult(value: unknown): SubmissionResult | null {
       typeof result.message === 'string' && result.message.trim()
         ? result.message
         : duplicate
-          ? '订单已经登记，无需再次提交。'
+          ? '购买需求已经登记，无需再次提交。'
           : '登记已收到，工作人员会尽快联系您确认。',
   };
 }
@@ -169,11 +171,24 @@ export function OrderForm() {
 
       const savedDraft = window.localStorage.getItem(DRAFT_KEY);
       const parsedDraft = savedDraft ? (JSON.parse(savedDraft) as Partial<Draft>) : {};
-      const querySource = new URLSearchParams(window.location.search).get('src')?.trim();
+      const query = new URLSearchParams(window.location.search);
+      const querySource = query.get('src')?.trim();
+      const queryProductId = query.get('productId')?.trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
+      const queryProductName = query.get('productName')?.trim().slice(0, 80);
       const storedSource = window.localStorage.getItem(SOURCE_KEY)?.trim();
-      const source = querySource || parsedDraft.src || storedSource || 'website';
+      const source =
+        querySource === 'flash-sale' && queryProductId
+          ? `flash-sale:${queryProductId}`
+          : querySource || parsedDraft.src || storedSource || 'website';
       if (querySource) window.localStorage.setItem(SOURCE_KEY, querySource);
-      setDraft({ ...emptyDraft, ...parsedDraft, mushrooms: parsedDraft.mushrooms ?? [], src: source });
+      const selectedMushrooms = [...(parsedDraft.mushrooms ?? [])];
+      const knownMushroom = queryProductName
+        ? mushrooms.find((item) => queryProductName.includes(item) || item.includes(queryProductName))
+        : undefined;
+      if (knownMushroom && !selectedMushrooms.includes(knownMushroom)) selectedMushrooms.push(knownMushroom);
+      const productNote = queryProductName && !knownMushroom ? `限时抢购商品：${queryProductName}` : '';
+      const remarks = [productNote, parsedDraft.remarks].filter(Boolean).join('\n');
+      setDraft({ ...emptyDraft, ...parsedDraft, mushrooms: selectedMushrooms, remarks, src: source });
     } catch {
       setDraft({ ...emptyDraft, src: 'website' });
     } finally {
@@ -314,7 +329,7 @@ export function OrderForm() {
       <section aria-live="polite" className="rounded-3xl bg-white p-7 text-center shadow-soft sm:p-10">
         <CheckCircle2 aria-hidden="true" className="mx-auto text-forest-600" size={58} />
         <h2 className="mt-5 font-serif text-3xl text-forest-900">
-          {result.duplicate ? '订单已经登记' : '登记已收到'}
+          {result.duplicate ? '购买需求已经登记' : '登记已收到'}
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-stone-600">{result.message}</p>
         <p className="mx-auto mt-2 max-w-lg text-xs leading-6 text-stone-500">
@@ -505,9 +520,17 @@ export function OrderForm() {
 
       <div aria-live="polite">
         {submitError ? (
-          <p role="alert" className="mb-3 rounded-xl bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
-            {submitError}
-          </p>
+          <div className="mb-4 rounded-2xl bg-red-50 p-4">
+            <p role="alert" className="text-sm leading-6 text-red-700">{submitError}</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <a href={siteConfig.orderFormUrl} className="inline-flex min-h-11 items-center justify-center rounded-full border border-red-200 bg-white px-3 py-2 text-center text-xs font-semibold text-red-700">
+                重新打开登记表
+              </a>
+              <WechatContactDialog className="inline-flex min-h-11 items-center justify-center rounded-full bg-forest-700 px-3 py-2 text-xs font-semibold text-white">
+                微信咨询
+              </WechatContactDialog>
+            </div>
+          </div>
         ) : null}
         <button
           type="submit"

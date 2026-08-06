@@ -5,7 +5,7 @@ import { OrderForm } from '@/components/order-form';
 import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
-  title: '订单登记｜菌鲜到',
+  title: '登记购买｜菌鲜到',
   description: '登记云南野生菌购买需求，工作人员将联系确认当天品相、价格与配送。',
   alternates: { canonical: '/order' },
 };
@@ -34,7 +34,7 @@ export default function OrderPage() {
           <h1 className="mt-3 font-serif text-4xl leading-tight text-forest-900 sm:text-5xl">
             云南野生菌
             <br />
-            订购登记
+            登记购买
           </h1>
           <p className="mt-5 max-w-lg text-sm leading-7 text-stone-600">
             填写购买需求后，工作人员会联系您确认当天鲜菌品相、实际价格、配送费用和送达时间。
@@ -42,7 +42,7 @@ export default function OrderPage() {
           <div className="mt-7 rounded-2xl border border-forest-100 bg-forest-50 p-5 text-sm leading-7 text-forest-900">
             <p>配送范围：{siteConfig.deliveryArea}</p>
             <p>满 {siteConfig.minOrderAmount} 元起送 · {siteConfig.deliverySpeed}</p>
-            <p className="mt-2 text-xs text-forest-700">订单登记成功前请勿关闭页面或重复点击提交。</p>
+            <p className="mt-2 text-xs text-forest-700">登记提交成功前请勿关闭页面或重复点击提交。</p>
           </div>
         </section>
         <OrderForm />

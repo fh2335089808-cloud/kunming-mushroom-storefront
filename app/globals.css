@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 * { box-sizing:border-box; }
@@ -9,6 +9,6 @@ body { margin:0; color:#1c2b1f; background:#f7f4ec; font-family:Arial,"PingFang 
 
 .mobile-sticky-cta { bottom: calc(5.25rem + env(safe-area-inset-bottom)); }
 .mobile-safe-footer { padding-bottom: 2rem; }
-body { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
+body { padding-bottom: calc(5.75rem + env(safe-area-inset-bottom)); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 @media (min-width: 768px) { body { padding-bottom: 0; } }

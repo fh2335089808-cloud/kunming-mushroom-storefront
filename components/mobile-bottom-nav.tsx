@@ -10,43 +10,28 @@ import {
   PackageSearch,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { WechatContactDialog } from '@/components/wechat-contact-dialog';
 
 const navItems = [
-  { id: 'home', label: '首页', href: '/#home', Icon: Home },
-  { id: 'market', label: '今日现货', href: '/#market', Icon: PackageSearch },
-  { id: 'buyers', label: '买家秀', href: '/#buyers', Icon: MessageSquareHeart },
-  { id: 'order', label: '订单登记', href: '/order', Icon: ClipboardList },
-  { id: 'wechat', label: '联系微信', href: '/#wechat', Icon: MessageCircle },
+  { id: 'home', label: '首页', href: '/', Icon: Home },
+  { id: 'market', label: '今日现货', href: '/products', Icon: PackageSearch },
+  { id: 'buyers', label: '买家秀', href: '/buyers', Icon: MessageSquareHeart },
+  { id: 'order', label: '登记购买', href: '/order', Icon: ClipboardList },
 ] as const;
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const [active, setActive] = useState(pathname === '/order' ? 'order' : 'home');
+  const routeActive = pathname === '/products' || pathname.startsWith('/products/')
+    ? 'market'
+    : pathname === '/buyers'
+      ? 'buyers'
+      : pathname === '/order'
+        ? 'order'
+        : 'home';
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname.startsWith('/admin')) return;
-    if (pathname === '/order') {
-      setActive('order');
-      return;
-    }
-    if (pathname !== '/') return;
-
-    const sections = ['home', 'market', 'buyers', 'wechat']
-      .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => Boolean(element));
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActive(visible.target.id);
-      },
-      { rootMargin: '-32% 0px -56%', threshold: [0, 0.1, 0.5] },
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+    setContactOpen(false);
   }, [pathname]);
 
   if (pathname.startsWith('/admin')) return null;
@@ -58,22 +43,32 @@ export function MobileBottomNav() {
     >
       <div className="mx-auto grid h-[4.5rem] max-w-lg grid-cols-5">
         {navItems.map(({ id, label, href, Icon }) => {
-          const selected = active === id;
+          const selected = !contactOpen && routeActive === id;
           return (
             <Link
               key={id}
               href={href}
               aria-current={selected ? 'page' : undefined}
-              onClick={() => setActive(id)}
-              className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition active:bg-forest-50 ${
-                selected ? 'text-forest-700' : 'text-stone-500'
-              }`}
+              onClick={(event) => {
+                if (id === 'home' && pathname === '/') {
+                  event.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+              className={'flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition active:bg-forest-50 ' + (selected ? 'text-forest-700' : 'text-stone-500')}
             >
               <Icon aria-hidden="true" size={20} strokeWidth={selected ? 2.4 : 1.9} />
               <span className="truncate">{label}</span>
             </Link>
           );
         })}
+        <WechatContactDialog
+          onOpenChange={setContactOpen}
+          className={'flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition active:bg-forest-50 ' + (contactOpen ? 'text-forest-700' : 'text-stone-500')}
+        >
+          <MessageCircle aria-hidden="true" size={20} strokeWidth={contactOpen ? 2.4 : 1.9} />
+          <span className="truncate">联系微信</span>
+        </WechatContactDialog>
       </div>
     </nav>
   );

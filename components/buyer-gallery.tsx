@@ -45,7 +45,7 @@ export function BuyerGallery() {
           ) : null}
         </div>
         <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-forest-500 px-5 py-2.5 text-sm font-semibold text-forest-700">
-          {expanded ? '收起买家秀' : '查看更多买家秀与今日鲜菌'}
+          {expanded ? '收起买家秀' : '查看更多买家秀'}
         </button>
         <p className="mt-2 text-xs leading-5 text-stone-500">群内持续更新到货实拍、当天品种与价格</p>
       </div>
