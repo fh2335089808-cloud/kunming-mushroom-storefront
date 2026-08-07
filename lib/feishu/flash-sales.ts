@@ -89,6 +89,17 @@ const priceValue = (value: unknown): string => {
 
 const field = (fields: Record<string, unknown>, name: string) => fields[name];
 
+const maskedIdentifier = (value: string | undefined) => {
+  const normalized = value?.trim();
+  if (!normalized) return 'missing';
+  if (normalized.length <= 8) return `${normalized.slice(0, 2)}…${normalized.slice(-2)}`;
+  return `${normalized.slice(0, 4)}…${normalized.slice(-4)}`;
+};
+
+const diagnosticLog = (event: string, details: Record<string, unknown>) => {
+  console.info(`[feishu:flash-sale] ${event}`, details);
+};
+
 const comparableName = (value: string) =>
   value.replace(/[（(].*?[）)]/g, '').replace(/\s+/g, '').trim();
 
@@ -103,7 +114,8 @@ const destinationFor = (productId: string, productName: string) => {
 
 const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null => {
   const fields = record.fields ?? {};
-  const activityStatus = textValue(field(fields, '活动状态'));
+  const activityStatus = textValue(field(fields, '活动状态判断'));
+  const managementStatus = textValue(field(fields, '管理状态'));
   const startAt = timestampValue(field(fields, '活动开始时间'));
   const endAt = timestampValue(field(fields, '活动结束时间'));
   const productField = field(fields, '活动商品');
@@ -113,9 +125,37 @@ const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null =>
   const stock = numericValue(field(fields, '活动库存'));
   const availability = textValue(field(fields, '可售状态'));
 
+  const rejectionReasons = [
+    !record.record_id ? 'missing_record_id' : '',
+    !activityStatus ? 'missing_activity_status' : '',
+    !managementStatus.includes('已发布') ? 'management_status_not_published' : '',
+    !Number.isFinite(startAt) ? 'invalid_start_time' : '',
+    !Number.isFinite(endAt) ? 'invalid_end_time' : '',
+    Number.isFinite(startAt) && Number.isFinite(endAt) && endAt <= startAt ? 'end_not_after_start' : '',
+    !productId ? 'missing_product_id' : '',
+    !productName ? 'missing_product_name' : '',
+    !price ? 'missing_activity_price' : '',
+  ].filter(Boolean);
+
+  diagnosticLog('record-mapped', {
+    recordId: maskedIdentifier(record.record_id),
+    fieldNames: Object.keys(fields),
+    activityStatus,
+    managementStatus,
+    startAt: Number.isFinite(startAt) ? new Date(startAt).toISOString() : 'invalid',
+    endAt: Number.isFinite(endAt) ? new Date(endAt).toISOString() : 'invalid',
+    productId: maskedIdentifier(productId),
+    productName,
+    price,
+    stock,
+    availability,
+    rejectionReasons,
+  });
+
   if (
     !record.record_id ||
     !activityStatus ||
+    !managementStatus.includes('已发布') ||
     !Number.isFinite(startAt) ||
     !Number.isFinite(endAt) ||
     endAt <= startAt ||
@@ -130,7 +170,21 @@ const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null =>
     { activityStatus, startAt, endAt, stock, availability },
     now,
   );
-  if (!uiState) return null;
+  if (!uiState) {
+    diagnosticLog('record-filtered', {
+      recordId: maskedIdentifier(record.record_id),
+      reason: 'activity_state_excluded',
+      activityStatus,
+      availability,
+    });
+    return null;
+  }
+
+  diagnosticLog('record-accepted', {
+    recordId: maskedIdentifier(record.record_id),
+    productName,
+    uiState,
+  });
 
   return {
     recordId: record.record_id,
@@ -162,7 +216,23 @@ const fetchFlashSaleUnsafe = async (): Promise<FlashSale | null> => {
   const appSecret = config.appSecret?.trim();
   const appToken = config.contentAppToken?.trim();
   const tableId = config.tableIds.flashSale?.trim();
-  if (!appId || !appSecret || !appToken || !tableId) return null;
+  diagnosticLog('config', {
+    appIdConfigured: Boolean(appId),
+    appSecretConfigured: Boolean(appSecret),
+    appTokenConfigured: Boolean(appToken),
+    tableIdConfigured: Boolean(tableId),
+    baseId: maskedIdentifier(appToken),
+    tableId: maskedIdentifier(tableId),
+  });
+  if (!appId || !appSecret || !appToken || !tableId) {
+    diagnosticLog('config-missing', {
+      appIdConfigured: Boolean(appId),
+      appSecretConfigured: Boolean(appSecret),
+      appTokenConfigured: Boolean(appToken),
+      tableIdConfigured: Boolean(tableId),
+    });
+    return null;
+  }
 
   const tokenResponse = await fetch(
     'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal',
@@ -175,6 +245,11 @@ const fetchFlashSaleUnsafe = async (): Promise<FlashSale | null> => {
   );
   const tokenBody = (await tokenResponse.json()) as TenantTokenResponse;
   const token = tokenBody.tenant_access_token;
+  diagnosticLog('tenant-token-response', {
+    httpStatus: tokenResponse.status,
+    feishuCode: tokenBody.code ?? null,
+    tokenReceived: Boolean(token),
+  });
   if (!tokenResponse.ok || tokenBody.code !== 0 || !token) return null;
 
   const recordsResponse = await fetch(
@@ -185,20 +260,34 @@ const fetchFlashSaleUnsafe = async (): Promise<FlashSale | null> => {
     },
   );
   const recordsBody = (await recordsResponse.json()) as RecordsResponse;
+  const records = recordsBody.data?.items ?? [];
+  diagnosticLog('records-response', {
+    httpStatus: recordsResponse.status,
+    feishuCode: recordsBody.code ?? null,
+    recordCount: records.length,
+  });
   if (!recordsResponse.ok || recordsBody.code !== 0) return null;
 
   const now = Date.now();
-  return (recordsBody.data?.items ?? [])
+  const normalizedRecords = records
     .map((record) => normalizeRecord(record, now))
-    .filter((item): item is FlashSale => item !== null)
+    .filter((item): item is FlashSale => item !== null);
+  diagnosticLog('records-filtered', {
+    beforeCount: records.length,
+    afterCount: normalizedRecords.length,
+  });
+  return normalizedRecords
     .sort((left, right) => priority[left.uiState] - priority[right.uiState] || left.startAt - right.startAt)[0] ?? null;
 };
 
 const fetchFlashSale = async (): Promise<FlashSale | null> => {
   try {
     return await fetchFlashSaleUnsafe();
-  } catch {
+  } catch (error) {
     // 鉴权、网络或表结构异常时隐藏整个模块，避免首页出现空白卡片或错误按钮。
+    diagnosticLog('request-error', {
+      errorType: error instanceof Error ? error.name : typeof error,
+    });
     return null;
   }
 };
