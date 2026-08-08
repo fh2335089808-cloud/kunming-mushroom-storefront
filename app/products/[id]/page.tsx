@@ -29,7 +29,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
         <div className="container py-8 sm:py-14">
           <Link href="/products" className="inline-flex min-h-11 items-center text-sm font-semibold text-forest-700">← 返回今日现货</Link>
           <article className="mt-4 overflow-hidden rounded-3xl bg-white shadow-soft md:grid md:grid-cols-2">
-            <div className="relative aspect-[4/3] min-h-72 overflow-hidden bg-stone-100 md:aspect-auto">
+            <div className="relative aspect-[16/10] overflow-hidden bg-stone-100 md:aspect-auto">
               <Image fill sizes="(max-width: 768px) 100vw, 50vw" src={product.image} alt={product.name + '现货图片'} className="object-cover" priority />
             </div>
             <div className="p-6 sm:p-9">
@@ -39,9 +39,9 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
               </div>
               <h1 className="mt-5 font-serif text-4xl text-forest-900">{product.name}</h1>
               {flashSale ? (
-                <div className="mt-5">
-                  <p className="text-xs font-semibold tracking-[.14em] text-forest-500">限时活动价</p>
-                  <p className="mt-1 text-2xl font-semibold text-forest-700">{flashSale.price}</p>
+                <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <p className="text-sm text-stone-400 line-through">原价 {product.price}</p>
+                  <p className="text-2xl font-semibold text-forest-700">特惠价 {flashSale.price}</p>
                 </div>
               ) : (
                 <p className="mt-5 text-2xl font-semibold text-forest-700">{product.price}<span className="ml-2 text-sm font-normal text-stone-500">/ {product.unit}</span></p>

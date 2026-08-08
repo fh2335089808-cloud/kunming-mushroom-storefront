@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Clock3 } from 'lucide-react';
+import { Clock3 } from 'lucide-react';
 import { FlashSaleCountdown } from '@/components/flash-sale-countdown';
-import { todayProducts } from '@/data/today-products';
+import { products } from '@/lib/data';
 import type { FlashSale } from '@/lib/feishu/flash-sales';
 
 const formatTime = (timestamp: number) =>
@@ -16,83 +16,93 @@ const formatTime = (timestamp: number) =>
   }).format(timestamp);
 
 const comparableName = (value: string) =>
-  value.replace(/（.*?）/g, '').replace(/\s+/g, '').trim();
+  value.replace(/新鲜|野生|（.*?）|\s+/g, '').trim();
+
+const matchesSaleProduct = (saleName: string, productName: string) => {
+  const normalizedSale = comparableName(saleName);
+  const normalizedProduct = comparableName(productName);
+  return normalizedSale.includes(normalizedProduct) || normalizedProduct.includes(normalizedSale);
+};
+
+const catalogOrderHref = (id: string, name: string) =>
+  `/order?${new URLSearchParams({ src: 'daily-deal', productId: id, productName: name }).toString()}`;
 
 export function FlashSaleSection({ sale }: { sale: FlashSale | null }) {
-  const product = sale
-    ? todayProducts.find(
-        (item) => item.id === sale.productId || comparableName(item.name) === comparableName(sale.productName),
-      )
+  const matchedProduct = sale
+    ? products.find((product) => matchesSaleProduct(sale.productName, product.name))
     : undefined;
+  const catalogProducts = products
+    .filter((product) => product.id !== matchedProduct?.id)
+    .slice(0, sale ? 3 : 4);
   const active = sale?.uiState === 'active';
-  const stockLabel = sale?.stock === null
-    ? sale.availability || '可售状态以当日活动为准'
-    : sale
-      ? `剩余库存：${sale.stock}`
-      : '';
-  const originalPrice = product && !product.demo ? product.price : '以当日行情为准';
-  const hasConfirmedOriginalPrice = Boolean(product && !product.demo && product.price);
 
   return (
-    <section className="bg-[#eeeadd]" aria-labelledby="daily-featured-title">
-      <div className="container py-4 sm:py-6">
-        <article className="rounded-3xl border border-amber-200/70 bg-white p-5 shadow-soft sm:p-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-forest-700 px-3 py-1.5 text-xs font-semibold text-white">每日精选</span>
-            <span className="text-xs font-medium tracking-[.16em] text-amber-700">鲜菌特惠</span>
+    <section id="daily-deals" className="scroll-mt-16 bg-[#eeeadd]" aria-labelledby="daily-deals-title">
+      <div className="container py-7 sm:py-10">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold tracking-[.18em] text-amber-700">鲜菌特惠</p>
+            <h2 id="daily-deals-title" className="mt-1 font-serif text-3xl text-forest-900 sm:text-4xl">每日特惠</h2>
           </div>
+          <Link href="/products" className="shrink-0 text-sm font-semibold text-forest-700">全部现货</Link>
+        </div>
 
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {sale ? (
-            <div className="mt-4 grid gap-5 sm:grid-cols-[11rem_minmax(0,1fr)_auto] sm:items-center">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100 sm:aspect-square">
+            <article className="overflow-hidden rounded-2xl bg-white shadow-soft">
+              <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
                 <Image
                   fill
-                  sizes="(max-width: 639px) 100vw, 11rem"
-                  src={product?.image ?? '/images/mushrooms/yunnan-basket.webp'}
+                  sizes="(max-width: 639px) 50vw, 25vw"
+                  src={matchedProduct?.image ?? '/images/mushrooms/yunnan-basket.webp'}
                   alt={`${sale.productName} 商品图片`}
                   className="object-cover"
                 />
+                <span className="absolute left-2 top-2 rounded-full bg-forest-700 px-2.5 py-1 text-[10px] font-semibold text-white">今日特惠</span>
               </div>
-              <div className="min-w-0">
-                <h2 id="daily-featured-title" className="font-serif text-2xl text-forest-900 sm:text-3xl">{sale.productName}</h2>
-                <p className="mt-2 text-sm text-stone-500">鲜菌特惠价格以本次活动记录为准</p>
-                <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <p className="text-sm text-stone-500">
-                    原价：<span className={hasConfirmedOriginalPrice ? 'line-through' : ''}>{originalPrice}</span>
-                  </p>
-                  <p className="text-2xl font-semibold text-forest-700">特惠价：{sale.price}</p>
+              <div className="p-3 sm:p-4">
+                <h3 className="truncate font-serif text-lg text-forest-900 sm:text-xl">{sale.productName}</h3>
+                <div className="mt-2 flex flex-wrap items-baseline gap-x-2">
+                  {matchedProduct ? <span className="text-xs text-stone-400 line-through">原价 ¥{matchedProduct.price}</span> : null}
+                  <span className="font-semibold text-forest-700">{sale.price}</span>
                 </div>
-                <p className="mt-3 text-xs text-stone-500">{stockLabel}</p>
-                <p className="mt-1 text-xs text-stone-500">活动时间：{formatTime(sale.startAt)}—{formatTime(sale.endAt)}</p>
-                <p className="mt-2 inline-flex items-center gap-1 text-xs text-stone-500">
-                  <Clock3 aria-hidden="true" size={14} />
+                <p className="mt-2 text-[11px] text-stone-500">
+                  {sale.stock === null ? '库存以当日确认为准' : `剩余 ${sale.stock}`}
+                </p>
+                <p className="mt-1 truncate text-[10px] text-stone-400">{formatTime(sale.startAt)}—{formatTime(sale.endAt)}</p>
+                <p className="mt-1 inline-flex items-center gap-1 text-[10px] text-forest-700">
+                  <Clock3 aria-hidden="true" size={12} />
                   <FlashSaleCountdown startAt={sale.startAt} endAt={sale.endAt} state={sale.uiState} />
                 </p>
+                {active ? (
+                  <Link href={sale.purchaseHref} className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-forest-700 px-3 py-2 text-xs font-semibold text-white">
+                    登记购买
+                  </Link>
+                ) : (
+                  <button type="button" disabled className="mt-3 inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-stone-200 px-3 py-2 text-xs font-semibold text-stone-500">
+                    {sale.buttonLabel}
+                  </button>
+                )}
               </div>
-              {active ? (
-                <Link
-                  href={sale.purchaseHref}
-                  className="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-1 rounded-full bg-forest-700 px-6 py-3 text-sm font-semibold text-white sm:w-auto"
-                >
-                  立即登记购买 <ArrowRight aria-hidden="true" size={16} />
+            </article>
+          ) : null}
+
+          {catalogProducts.map((product) => (
+            <article key={product.id} className="overflow-hidden rounded-2xl bg-white shadow-soft">
+              <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
+                <Image fill sizes="(max-width: 639px) 50vw, 25vw" src={product.image} alt={`${product.name} 商品图片`} className="object-cover" />
+              </div>
+              <div className="p-3 sm:p-4">
+                <h3 className="truncate font-serif text-lg text-forest-900 sm:text-xl">{product.name}</h3>
+                <p className="mt-2 font-semibold text-forest-700">¥{product.price}</p>
+                <p className="mt-1 truncate text-[11px] text-stone-500">{product.spec}</p>
+                <Link href={catalogOrderHref(product.id, product.name)} className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-forest-500 px-3 py-2 text-xs font-semibold text-forest-700">
+                  登记购买
                 </Link>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center rounded-full bg-stone-200 px-6 py-3 text-sm font-semibold text-stone-500 sm:w-auto"
-                >
-                  {sale.buttonLabel}
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="mt-4 rounded-2xl bg-stone-50 px-5 py-6 sm:px-6">
-              <h2 id="daily-featured-title" className="font-serif text-2xl text-forest-900">今日精选鲜菌准备中</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-500">新鲜菌品每日更新，敬请期待</p>
-            </div>
-          )}
-        </article>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
