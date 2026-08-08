@@ -35,6 +35,7 @@ export function FlashSaleSection({ sale }: { sale: FlashSale | null }) {
     .filter((product) => product.id !== matchedProduct?.id)
     .slice(0, sale ? 3 : 4);
   const active = sale?.uiState === 'active';
+  const originalPrice = sale?.originalPrice || (matchedProduct ? `¥${matchedProduct.price}` : '');
 
   return (
     <section id="daily-deals" className="scroll-mt-16 bg-[#eeeadd]" aria-labelledby="daily-deals-title">
@@ -63,7 +64,7 @@ export function FlashSaleSection({ sale }: { sale: FlashSale | null }) {
               <div className="p-3 sm:p-4">
                 <h3 className="truncate font-serif text-lg text-forest-900 sm:text-xl">{sale.productName}</h3>
                 <div className="mt-2 flex flex-wrap items-baseline gap-x-2">
-                  {matchedProduct ? <span className="text-xs text-stone-400 line-through">原价 ¥{matchedProduct.price}</span> : null}
+                  {originalPrice ? <span className="text-xs text-stone-400 line-through">原价 {originalPrice}</span> : null}
                   <span className="font-semibold text-forest-700">{sale.price}</span>
                 </div>
                 <p className="mt-2 text-[11px] text-stone-500">

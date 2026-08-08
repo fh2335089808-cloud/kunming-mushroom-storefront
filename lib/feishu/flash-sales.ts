@@ -29,6 +29,7 @@ export type FlashSale = {
   productId: string;
   productName: string;
   price: string;
+  originalPrice: string;
   startAt: number;
   endAt: number;
   stock: number | null;
@@ -119,9 +120,13 @@ const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null =>
   const startAt = timestampValue(field(fields, '活动开始时间'));
   const endAt = timestampValue(field(fields, '活动结束时间'));
   const productField = field(fields, '关联SKU') ?? field(fields, '活动商品');
-  const productName = textValue(field(fields, '商品名称')) || textValue(productField);
+  const productName =
+    textValue(field(fields, '商品名称')) ||
+    textValue(field(fields, '活动名称')) ||
+    textValue(productField);
   const productId = relationId(productField) || record.record_id?.trim() || '';
   const price = priceValue(field(fields, '抢购价格') ?? field(fields, '活动价格'));
+  const originalPrice = priceValue(field(fields, '日常售价'));
   const stock = numericValue(field(fields, '活动剩余库存') ?? field(fields, '活动库存'));
   const availability = textValue(field(fields, '前端是否展示') ?? field(fields, '可售状态'));
 
@@ -147,6 +152,7 @@ const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null =>
     productId: maskedIdentifier(productId),
     productName,
     price,
+    originalPrice,
     stock,
     availability,
     rejectionReasons,
@@ -191,6 +197,7 @@ const normalizeRecord = (record: FeishuRecord, now: number): FlashSale | null =>
     productId,
     productName,
     price,
+    originalPrice,
     startAt,
     endAt,
     stock,
